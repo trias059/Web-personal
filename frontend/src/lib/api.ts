@@ -3,15 +3,6 @@ import type { Session, SessionUser } from './types'
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8080').replace(/\/+$/, '')
 
-export class ApiError extends Error {
-  readonly status: number
-
-  constructor(status: number, message: string) {
-    super(message)
-    this.status = status
-  }
-}
-
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
 export async function api<T>(path: string, method: Method = 'GET', body?: unknown): Promise<T> {
@@ -27,14 +18,14 @@ export async function api<T>(path: string, method: Method = 'GET', body?: unknow
       body: body === undefined ? undefined : JSON.stringify(body),
     })
   } catch {
-    throw new ApiError(0, 'Tidak bisa terhubung ke server. Periksa koneksi atau VITE_API_URL.')
+    throw new Error('Tidak bisa terhubung ke server. Periksa koneksi atau VITE_API_URL.')
   }
 
   // Token kedaluwarsa atau akun dihapus: keluarkan pengguna agar tidak terjebak.
   if (res.status === 401 && token) logout()
   if (!res.ok) {
     const data = (await res.json().catch(() => null)) as { error?: string } | null
-    throw new ApiError(res.status, data?.error ?? `Permintaan gagal (${res.status})`)
+    throw new Error(data?.error ?? `Permintaan gagal (${res.status})`)
   }
   return (res.status === 204 ? undefined : await res.json()) as T
 }
