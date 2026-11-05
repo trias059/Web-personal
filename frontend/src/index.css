@@ -20,6 +20,10 @@
   --color-good-soft: #e3f1e8;
   --color-bad: #b42318;
   --color-bad-soft: #fbe5e3;
+
+  /* Polaritas mood di grafik Curhat (pasangan diverging biru/merah, lolos cek CVD). */
+  --color-mood-up: #2a78d6;
+  --color-mood-down: #e34948;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -38,6 +42,8 @@
     --color-good-soft: #17301f;
     --color-bad: #f2867b;
     --color-bad-soft: #3b1714;
+    --color-mood-up: #3987e5;
+    --color-mood-down: #e66767;
   }
 }
 

@@ -21,6 +21,7 @@ type Term struct {
 const (
 	negationFactor = -0.6 // "tidak senang" berlawanan arah dan lebih lemah dari "sedih"
 	boostFactor    = 1.5  // "sangat senang", "senang banget"
+	softenFactor   = 0.5  // "agak capek", "sedikit kecewa"
 	// normalizer menekan jumlah bobot ke rentang -1..1 (seperti VADER).
 	normalizer = 15.0
 	// labelThreshold: skor dengan |skor| di bawah ini dianggap netral.
@@ -28,8 +29,9 @@ const (
 )
 
 // AnalyzeSentiment menilai mood teks berbahasa Indonesia (dan Inggris) memakai
-// leksikon berbobot dengan tiga aturan: negasi ("tidak senang"), penguat
-// ("senang banget"), dan kontras (bagian setelah "tapi" lebih berbobot).
+// leksikon berbobot dengan empat aturan: negasi ("tidak senang"), penguat
+// ("senang banget"), pelunak ("agak capek"), dan kontras (bagian setelah "tapi"
+// lebih berbobot).
 func AnalyzeSentiment(text string) Sentiment {
 	terms := []Term{}
 	var sum float64
@@ -51,6 +53,9 @@ func AnalyzeSentiment(text string) Sentiment {
 			}
 			if boosted(tokens, i) {
 				weight *= boostFactor
+			}
+			if i > 0 && softeners[tokens[i-1]] {
+				weight *= softenFactor
 			}
 			switch {
 			case contrastAt < 0:

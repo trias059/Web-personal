@@ -18,6 +18,7 @@ func TestAnalyzeSentimentLabels(t *testing.T) {
 		{"I'm so tired and I don't feel good", "negatif"},
 		{"Tidak masalah, semuanya lancar", "positif"},
 		{"hari yang berat 😭💔", "negatif"},
+		{"Hari ini aku senang tapi agak capek", "netral"},
 	}
 	for _, tc := range cases {
 		got := AnalyzeSentiment(tc.text)
@@ -35,6 +36,9 @@ func TestAnalyzeSentimentRules(t *testing.T) {
 	boosted := AnalyzeSentiment("aku sangat senang").Score
 	if boosted <= plain {
 		t.Errorf("penguat tidak menaikkan skor: %.3f <= %.3f", boosted, plain)
+	}
+	if softened := AnalyzeSentiment("aku agak senang").Score; softened >= plain || softened <= 0 {
+		t.Errorf("pelunak harus menurunkan skor tanpa membalik arah: %.3f", softened)
 	}
 	if negated := AnalyzeSentiment("aku tidak senang").Score; negated >= 0 {
 		t.Errorf("negasi tidak membalik skor: %.3f", negated)

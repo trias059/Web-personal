@@ -59,6 +59,8 @@ var boostersBefore = setOf(
 
 var boostersAfter = setOf("banget", "bgt", "sekali", "pol", "poll")
 
+var softeners = setOf("agak", "sedikit", "rada", "slightly", "somewhat")
+
 var contrastWords = setOf("tapi", "tetapi", "namun", "but", "however")
 
 var emojiWeights = map[rune]float64{

@@ -6,6 +6,8 @@ import { KENANGAN, VLOG } from './lib/content'
 import { Login, Register } from './pages/Auth'
 import Biodata from './pages/Biodata'
 import { ContentDetail, ContentRoom } from './pages/ContentRoom'
+import Curhat from './pages/Curhat'
+import DataManagement from './pages/DataManagement'
 import Landing from './pages/Landing'
 import LearningItemPage from './pages/learning/LearningItem'
 import LearningRoom from './pages/learning/LearningRoom'
@@ -32,6 +34,12 @@ export default function App() {
         <Route element={<RoomGuard room="kenangan" />}>
           <Route path="kenangan" element={<ContentRoom key="kenangan" config={KENANGAN} />} />
           <Route path="kenangan/:id" element={<ContentDetail key="kenangan" config={KENANGAN} />} />
+        </Route>
+        <Route element={<RoomGuard room="curhat" />}>
+          <Route path="curhat" element={<Curhat />} />
+        </Route>
+        <Route element={<RoomGuard room="data" />}>
+          <Route path="data" element={<DataManagement />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Route>
