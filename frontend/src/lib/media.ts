@@ -1,4 +1,7 @@
-export type Media = { kind: 'youtube' | 'video' | 'image'; src: string }
+export type Media =
+  | { kind: 'youtube'; src: string; thumbnail: string }
+  | { kind: 'video'; src: string }
+  | { kind: 'image'; src: string }
 
 const VIDEO_EXTENSION = /\.(mp4|mov|ogg|webm)$/i
 
@@ -22,7 +25,11 @@ export function detectMedia(url: string): Media {
         ? (parsed.searchParams.get('v') ?? parsed.pathname.match(/^\/(?:shorts|embed|live)\/([^/]+)/)?.[1])
         : undefined
   if (youtubeId && /^[\w-]+$/.test(youtubeId)) {
-    return { kind: 'youtube', src: `https://www.youtube-nocookie.com/embed/${youtubeId}` }
+    return {
+      kind: 'youtube',
+      src: `https://www.youtube-nocookie.com/embed/${youtubeId}`,
+      thumbnail: `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`,
+    }
   }
   if (VIDEO_EXTENSION.test(parsed.pathname)) return { kind: 'video', src: url }
   return { kind: 'image', src: url }

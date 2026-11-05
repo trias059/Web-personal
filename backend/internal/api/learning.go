@@ -19,7 +19,7 @@ type learningRequest struct {
 	Progress int    `json:"progress" binding:"min=0,max=100"`
 }
 
-type trackQuery struct {
+type dueQuery struct {
 	Track string `form:"track" binding:"omitempty,oneof=bahasa backend ai"`
 	Limit int    `form:"limit" binding:"omitempty,min=1,max=100"`
 }
@@ -36,11 +36,7 @@ type reviewRequest struct {
 }
 
 func (s *Server) listLearning(c *gin.Context) {
-	var q trackQuery
-	if !bindQuery(c, &q) {
-		return
-	}
-	items, err := s.store.LearningItems(c.Request.Context(), q.Track, time.Now())
+	items, err := s.store.LearningItems(c.Request.Context(), time.Now())
 	respond(c, http.StatusOK, items, err)
 }
 
@@ -122,7 +118,7 @@ func (s *Server) createFlashcards(c *gin.Context) {
 }
 
 func (s *Server) dueFlashcards(c *gin.Context) {
-	var q trackQuery
+	var q dueQuery
 	if !bindQuery(c, &q) {
 		return
 	}

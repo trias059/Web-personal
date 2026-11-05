@@ -43,15 +43,10 @@ const selectFlashcard = `SELECT f.id, f.learning_item_id, i.title AS item_title,
 	f.ease, f.interval_days, f.repetitions, f.due_at, f.created_at
 	FROM flashcards f JOIN learning_items i ON i.id = f.learning_item_id`
 
-// LearningItems mengembalikan materi sesuai urutan dibuat; track kosong berarti semua jalur.
-func (s *Store) LearningItems(ctx context.Context, track string, now time.Time) ([]LearningItem, error) {
-	query, args := selectLearning, []any{now}
-	if track != "" {
-		query += ` WHERE i.track = ?`
-		args = append(args, track)
-	}
+// LearningItems mengembalikan semua materi sesuai urutan dibuat.
+func (s *Store) LearningItems(ctx context.Context, now time.Time) ([]LearningItem, error) {
 	items := []LearningItem{}
-	err := s.list(ctx, &items, query+` ORDER BY i.id`, args...)
+	err := s.list(ctx, &items, selectLearning+` ORDER BY i.id`, now)
 	return items, err
 }
 
