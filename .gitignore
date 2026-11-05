@@ -1,0 +1,21 @@
+# Rahasia lokal: hanya .env.example yang di-commit
+.env
+.env.*
+!.env.example
+
+# Database SQLite lokal
+*.db
+*.db-shm
+*.db-wal
+backend/data/
+
+# Hasil build & dependensi
+backend/bin/
+node_modules/
+dist/
+.vercel/
+
+# Editor/OS
+.DS_Store
+.idea/
+*.swp
