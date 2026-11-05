@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+/* Token warna semantik. Mode gelap mengikuti pengaturan sistem dengan menimpa
+   variabel yang sama, jadi komponen cukup memakai kelas seperti bg-surface. */
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+
+  --color-paper: #faf6ef;
+  --color-surface: #ffffff;
+  --color-sunken: #f3ede3;
+  --color-ink: #1f1b16;
+  --color-muted: #6b6257;
+  --color-line: #e7dfd3;
+  --color-accent: #c2522d;
+  --color-accent-strong: #a8431f;
+  --color-accent-soft: #f8e6dd;
+  --color-on-accent: #ffffff;
+  --color-good: #2f7d4f;
+  --color-good-soft: #e3f1e8;
+  --color-bad: #b42318;
+  --color-bad-soft: #fbe5e3;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #14110e;
+    --color-surface: #1d1915;
+    --color-sunken: #26211b;
+    --color-ink: #f3ece2;
+    --color-muted: #a89c8d;
+    --color-line: #352e26;
+    --color-accent: #e0764f;
+    --color-accent-strong: #ea8d69;
+    --color-accent-soft: #3a2419;
+    --color-on-accent: #1a120d;
+    --color-good: #6cc495;
+    --color-good-soft: #17301f;
+    --color-bad: #f2867b;
+    --color-bad-soft: #3b1714;
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+}
