@@ -14,19 +14,24 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/go-playground/validator/v10/non-standard/validators"
 
+	"github.com/trias059/web-personal/backend/internal/ai"
 	"github.com/trias059/web-personal/backend/internal/store"
 )
 
-// Validator Gin memakai nama field JSON di pesan error dan mengenal tag "notblank"
-// (teks wajib diisi dan tidak boleh hanya spasi).
+// Validator Gin memakai nama field JSON/query di pesan error dan mengenal tag
+// "notblank" (teks wajib diisi dan tidak boleh hanya spasi).
 func init() {
 	v, ok := binding.Validator.Engine().(*validator.Validate)
 	if !ok {
 		return
 	}
 	v.RegisterTagNameFunc(func(f reflect.StructField) string {
-		name, _, _ := strings.Cut(f.Tag.Get("json"), ",")
-		return name
+		for _, tag := range []string{"json", "form"} {
+			if name, _, _ := strings.Cut(f.Tag.Get(tag), ","); name != "" && name != "-" {
+				return name
+			}
+		}
+		return f.Name
 	})
 	if err := v.RegisterValidation("notblank", validators.NotBlank); err != nil {
 		panic(err)
@@ -37,11 +42,28 @@ func abort(c *gin.Context, status int, msg string) {
 	c.AbortWithStatusJSON(status, gin.H{"error": msg})
 }
 
-// fail menerjemahkan error dari store ke respons HTTP; error tak terduga dicatat di log.
+// respond mengirim data sebagai JSON (atau status saja jika data nil), atau error jika err tidak nil.
+func respond(c *gin.Context, status int, data any, err error) {
+	switch {
+	case err != nil:
+		fail(c, err)
+	case data == nil:
+		c.Status(status)
+	default:
+		c.JSON(status, data)
+	}
+}
+
+// fail menerjemahkan error dari store/AI ke respons HTTP; error tak terduga dicatat di log.
 func fail(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, store.ErrNotFound):
 		abort(c, http.StatusNotFound, "data tidak ditemukan")
+	case errors.Is(err, ai.ErrDisabled):
+		abort(c, http.StatusServiceUnavailable, err.Error())
+	case errors.Is(err, ai.ErrUpstream):
+		log.Printf("%s %s: %v", c.Request.Method, c.FullPath(), err)
+		abort(c, http.StatusBadGateway, err.Error())
 	default:
 		log.Printf("%s %s: %v", c.Request.Method, c.FullPath(), err)
 		abort(c, http.StatusInternalServerError, "terjadi kesalahan di server")
@@ -49,7 +71,15 @@ func fail(c *gin.Context, err error) {
 }
 
 func bindJSON(c *gin.Context, dst any) bool {
-	err := c.ShouldBindJSON(dst)
+	return bindWith(c, dst, binding.JSON)
+}
+
+func bindQuery(c *gin.Context, dst any) bool {
+	return bindWith(c, dst, binding.Query)
+}
+
+func bindWith(c *gin.Context, dst any, b binding.Binding) bool {
+	err := c.ShouldBindWith(dst, b)
 	if err == nil {
 		return true
 	}

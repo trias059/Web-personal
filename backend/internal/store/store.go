@@ -61,7 +61,10 @@ func connect(url string) (*sqlx.DB, goose.Dialect, error) {
 	if err := os.MkdirAll(filepath.Dir(url), 0o755); err != nil {
 		return nil, "", fmt.Errorf("membuat folder database: %w", err)
 	}
-	dsn := "file:" + url + "?_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)&_time_format=sqlite"
+	// Waktu disimpan sebagai teks UTC dengan format tetap agar perbandingan
+	// (mis. due_at <= now) benar secara leksikografis.
+	dsn := "file:" + url + "?_pragma=foreign_keys(1)&_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)" +
+		"&_time_format=sqlite&_timezone=UTC"
 	db, err := sqlx.Open("sqlite", dsn)
 	if err != nil {
 		return nil, "", err
